@@ -1,0 +1,891 @@
+<!--
+DasadappleOS
+The HTML, CSS and JS were put in one file because that is easier for me to work on.
+The code isn't super organized yet, but it is all here in one place.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<title>✦  DasadappleOS  ✦</title>
+<style>
+/* colors + the desktop styles */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --accent:#d65d2f;
+  --orange:#d65d2f;
+  --orange-pale:#f2c3a3;
+}
+/* most of the other colors I just typed in where I needed them, the 3 above
+   are the only ones the settings panel actually changes */
+
+*{box-sizing:border-box}
+body{margin:0;height:100vh;overflow:hidden;color:#252820;background:#e9e4d8;font-family:"Plus Jakarta Sans",Urbanist,sans-serif}
+button,input,textarea{font:inherit}
+button{cursor:pointer;color:inherit}
+button:focus-visible, input:focus-visible, textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+#desktop{position:relative;width:100%;height:100%;overflow:hidden;background:#e9e4d8;background-size:cover;background-position:center}
+.menustrip{position:absolute;z-index:1000;inset:0 0 auto;height:35px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;background:#252820;color:#e9e4d8;border-bottom:1px solid var(--accent);font-size:11px;letter-spacing:.04em}
+.logo{font-weight:800;letter-spacing:.12em}
+.menustrip .strip-left,.menustrip .strip-right{display:flex;align-items:center;gap:17px}
+.strip-left .hide-small{display:none}
+#headclock{font-variant-numeric:tabular-nums;font-weight:700}
+#headupdate{font-size:11px;color:#c5c4b8}
+#gearbtn{background:none;border:0;color:#e9e4d8;font-size:17px}
+
+.deskclock{position:absolute;z-index:2;right:5.5%;top:12%;width:310px;text-align:right;pointer-events:none;color:#252820;font-variant-numeric:tabular-nums}
+.deskclock .dayline{font-size:11px;font-weight:800;letter-spacing:.22em;color:#686b5d}
+.deskclock .bigtime{margin:8px 0 2px;font-size:clamp(42px,5vw,72px);line-height:1;font-weight:500;letter-spacing:-.075em}
+.deskclock .bigtime span{color:var(--accent);animation:blink 2s steps(2,end) infinite}
+.deskclock .dateline{font-size:10px;letter-spacing:.2em;color:#686b5d}
+@keyframes blink{50%{opacity:.35}}
+
+#window-layer{position:absolute;inset:35px 0 105px;z-index:5;pointer-events:none}
+.window{position:absolute;display:flex;flex-direction:column;width:510px;height:355px;min-width:280px;min-height:190px;background:#f5f1e8;border:1px solid #252820;box-shadow:5px 7px 0 rgba(37,40,32,.13);pointer-events:auto;animation:appear .22s cubic-bezier(.2,.8,.2,1);will-change:transform,opacity}
+.window.hidden{display:none}
+.window.maximized{left:12px!important;top:12px!important;width:calc(100% - 24px)!important;height:calc(100% - 24px)!important}
+@keyframes appear{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.windowhead{height:39px;flex:0 0 39px;display:flex;align-items:center;gap:10px;padding:0 11px;background:#d8d0c1;border-bottom:1px solid #252820;cursor:grab;user-select:none}
+.windowhead:active{cursor:grabbing}
+.dots{display:flex;gap:5px}
+.dots button{width:10px;height:10px;border:1px solid #252820;border-radius:50%;padding:0;background:var(--orange)}
+.dots button:nth-child(2){background:#d4b66e}
+.dots button:nth-child(3){background:#68775a}
+.windowhead .windowname{flex:1;font-size:11px;font-weight:800;letter-spacing:.04em}
+.windowhead .stamp{color:#686b5d;font-size:8px;letter-spacing:.15em;font-weight:800}
+
+.pane{flex:1;min-height:0;overflow:auto;padding:17px;font-size:12px}
+.pane::-webkit-scrollbar{width:7px}
+.pane::-webkit-scrollbar-thumb{background:#d8d0c1}
+
+.pane .hdr{margin:0 0 12px;color:var(--orange);font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.dim{color:#686b5d}
+.tiny{font-size:10px}
+.pane .spread{display:flex;align-items:center;gap:9px;justify-content:space-between}
+.pane .linedup{display:flex;align-items:center;gap:9px}
+
+.btn{padding:8px 11px;background:transparent;border:1px solid #252820;font-size:10px;font-weight:700;transition:background .12s,color .12s}
+.btn:hover{background:#252820;color:#e9e4d8}
+.btn.gobtn{background:var(--accent);border-color:var(--accent);color:#fff8ed}
+.btn.gobtn:hover{background:#252820;border-color:#252820}
+.boxtext{width:100%;min-width:0;padding:9px 10px;border:1px solid #bcb6a8;background:#fffdf7;color:#252820}
+.pane .notebox{padding:12px;border:1px solid #bcb6a8;background:#fffdf7}
+
+.pane .things{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px}
+.pane .thing{padding:12px 6px;border:1px solid transparent;text-align:center;cursor:pointer}
+.pane .thing:hover{border-color:var(--accent);background:#fffaf0}
+.pane .thing .mark{font-size:24px;margin-bottom:7px}
+.pane .thing .label{font-size:10px;font-weight:700}
+
+.terminal{display:flex;flex-direction:column;height:100%;background:#242820;color:#e8e5d9;font:12px/1.65 ui-monospace,Consolas,monospace}
+.terminal .out{flex:1;overflow:auto;padding:13px;white-space:pre-wrap}
+.terminal .out .accent{color:#f3a078}
+.terminal .out .good{color:#b6d09e}
+.terminal .type{display:flex;align-items:center;gap:8px;padding:10px;border-top:1px solid #56594d}
+.terminal .type span{color:#f3a078}
+.terminal .type input{flex:1;min-width:0;color:#fff;background:transparent;border:0;outline:0;font:inherit}
+
+.webpane{min-height:205px;padding:20px;background:#fffdf7;border:1px solid #bcb6a8}
+.webpane h2{margin:10px 0;font:650 27px/1 Fraunces,serif;letter-spacing:-.04em}
+.webpane p{max-width:430px;color:#686b5d;line-height:1.7}
+.note-area{width:100%;height:calc(100% - 54px);min-height:150px;resize:none;border:0;outline:0;background:transparent;color:#252820;font:13px/1.8 Urbanist,sans-serif}
+.note-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#686b5d;font-size:10px}
+.prefline{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #bcb6a8}
+.swatch{width:22px;height:22px;border:1px solid #252820;border-radius:50%}
+.swatch.picked{outline:2px solid var(--accent);outline-offset:2px}
+.spotify-frame{display:block;width:100%;height:352px;border:0;border-radius:12px;background:#ded8cc}
+.aboutwrap{display:grid;grid-template-columns:110px 1fr;gap:18px;align-items:start}
+.aboutwrap .bigd{min-height:130px;display:grid;place-items:center;background:var(--orange-pale);border:1px solid #252820;font:650 40px Fraunces,serif}
+
+.dock{position:absolute;z-index:1200;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:flex-end;gap:8px;max-width:calc(100vw - 24px);padding:10px 13px;border-radius:17px;background:#252820;border:1px solid #252820;box-shadow:0 12px 34px rgba(37,40,32,.18)}
+.dock .slot{min-width:60px;padding:5px 4px 3px;display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:transparent;color:#e9e4d8;transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.dock .slot:hover{transform:translateY(-5px)}
+.dock .slot .mark{width:44px;height:43px;border-radius:11px;display:grid;place-items:center;background:#e9e4d8;color:#252820;border-bottom:3px solid var(--accent);font-size:21px}
+.dock .slot .label{font-size:10px}
+.dock .slot .running{width:4px;height:4px;background:var(--orange-pale);border-radius:50%;opacity:0}
+.dock .slot.open .running{opacity:1}
+.dock .vrule{height:31px;width:1px;margin:0 4px 10px;background:#6e7066}
+
+.toast{position:absolute;z-index:2000;bottom:90px;left:50%;transform:translate(-50%,8px);padding:10px 14px;background:#252820;color:#e9e4d8;border-left:4px solid var(--accent);font-size:11px;opacity:0;pointer-events:none;transition:.16s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+#wallpaper-upload{display:none}
+
+.menu-pop{position:fixed;z-index:3000;min-width:178px;padding:5px;background:#f5f1e8;border:1px solid #252820;box-shadow:3px 4px 0 rgba(37,40,32,.18)}
+.menu-pop button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:9px 10px;font-size:11px}
+.menu-pop button:hover{background:#d8d0c1}
+.menu-pop button.nope{color:#a13d26}
+.menu-pop .sep{height:1px;background:#bcb6a8;margin:4px 2px}
+
+#command-layer[hidden]{display:none}
+.palette-backdrop{position:fixed;inset:0;z-index:2500;background:rgba(37,40,32,.12);display:flex;justify-content:center;align-items:flex-start;padding:48px 0 0}
+.command-palette{width:min(540px,calc(100vw - 28px));background:#f5f1e8;border:1px solid #252820;box-shadow:5px 6px 0 rgba(37,40,32,.18)}
+.command-palette form{display:flex;gap:10px;padding:14px;border-bottom:1px solid #bcb6a8}
+.command-palette input{flex:1;min-width:0;background:transparent;border:0;outline:0;font:13px "Plus Jakarta Sans",sans-serif}
+.palette-backdrop .hint{padding:9px 14px;color:#686b5d;font-size:10px}
+
+#boot-screen{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#f3f0e7;color:#242720;opacity:1;visibility:visible;transition:opacity .55s cubic-bezier(.22,1,.36,1),visibility 0s linear 0s}
+#boot-screen.is-leaving{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .55s cubic-bezier(.22,1,.36,1),visibility 0s linear .55s}
+#boot-screen .boot-content{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+#boot-screen .boot-mark{width:44px;height:44px;border:1.5px solid #292b25;border-radius:50%;display:grid;place-items:center;font:600 18px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:-1px;opacity:0;transform:translateY(7px) scale(.96);animation:boot-in .6s cubic-bezier(.22,1,.36,1) .08s forwards}
+#boot-screen .boot-name{font:600 12px/1.4 'Plus Jakarta Sans',sans-serif;letter-spacing:.22em;text-transform:uppercase;opacity:0;transform:translateY(7px);animation:boot-in .6s cubic-bezier(.22,1,.36,1) .22s forwards}
+#boot-screen .boot-name.hide{opacity:0;transform:translateY(-5px);animation:none}
+#boot-screen .hello{position:absolute;top:50%;left:50%;width:max-content;transform:translate(-50%,calc(-50% + 8px));font:500 clamp(38px,6vw,64px)/1 'Plus Jakarta Sans',sans-serif;letter-spacing:-.065em;opacity:0;visibility:hidden;transition:opacity .48s cubic-bezier(.22,1,.36,1),transform .48s cubic-bezier(.22,1,.36,1),visibility 0s linear .48s}
+#boot-screen .hello.show{opacity:1;visibility:visible;transform:translate(-50%,-50%);transition-delay:0s}
+#boot-screen.hello-phase .boot-mark{opacity:0;transform:translateY(-5px) scale(.98);transition:opacity .3s ease,transform .3s ease;animation:none}
+@keyframes boot-in{to{opacity:1;transform:translateY(0) scale(1)}}
+
+@media(max-width:700px){
+  .menustrip{padding:0 10px}
+  .menustrip .strip-left,.menustrip .strip-right{gap:9px}
+  .strip-left .hide-small{display:inline}
+  .deskclock{top:9%;right:14px;width:220px}
+  .deskclock .bigtime{font-size:48px}
+  .window{left:12px!important;width:calc(100vw - 24px)!important;height:min(510px,calc(100vh - 160px))}
+  .dock{gap:0;padding:5px}
+  .dock .slot{min-width:39px}
+  .dock .slot .mark{width:32px;height:32px;font-size:16px}
+  .dock .slot .label{font-size:8px}
+  .aboutwrap{grid-template-columns:1fr}
+  .aboutwrap .bigd{min-height:72px}
+}
+
+
+/* ok second pass, added some personality here. it's a lil chaotic in a good way */
+:root{--orange-pale:#ffd1c3}
+body { background: #f2eaff; font-family: "Urbanist", "Plus Jakarta Sans", sans-serif; }
+.menustrip { background: #201a32; border-bottom: 3px solid #b8ef72; color: #f2eaff; letter-spacing: .07em; }
+.menustrip #gearbtn{ color:#f2eaff }
+.logo { text-transform: lowercase; letter-spacing: -.025em; font-size: 13px; }
+
+/* tilted clock looked better than the straight one idk */
+.deskclock { transform: rotate(-1.5deg); color:#201a32 }
+.deskclock .dayline { color: #8b5ee8; letter-spacing: .27em }
+.deskclock .bigtime { font-weight: 800; letter-spacing: -.09em }
+.deskclock .bigtime span { color: #8b5ee8 }
+.deskclock .dateline { color:#201a32; display:inline-block; padding:5px 8px; margin-top:5px; background:#b8ef72; border-radius:5px }
+
+.window {
+  border: 2px solid #201a32;
+  border-radius: 13px 5px 13px 5px;
+  box-shadow: 7px 8px 0 rgba(43, 24, 70, .16);
+}
+.window, .pane{ background:#fffaff }
+.windowhead { background: #ded0ff; border-bottom: 2px solid #201a32; border-radius: 11px 3px 0 0 }
+.windowhead .windowname{ letter-spacing:-.01em }
+.windowhead .stamp { background: #b8ef72; color: #201a32; padding: 3px 6px; border-radius: 99px }
+.pane { scrollbar-color: #bca1f5 #f8f1ff }
+.dots button { border: 1.5px solid #201a32; width: 11px; height: 11px }
+
+.btn {
+  border-radius: 9px 4px 9px 4px;
+  border-width: 1.5px;
+  font-weight: 800;
+  letter-spacing: -.015em;
+}
+.btn:hover{ background:#201a32; color:#f2eaff }
+.btn.gobtn { background: #8b5ee8; border-color: #8b5ee8 }
+.btn.gobtn:hover { background: #ff6b45; border-color: #ff6b45 }
+.boxtext, .notebox, .webpane, .pane .thing { border-radius: 10px 4px 10px 4px }
+.pane .hdr { color: #8b5ee8; letter-spacing: .2em }
+.dim { color: #756786 }
+
+.pane .things{ }
+.pane .thing { border-radius: 12px 4px 12px 4px; transition: transform .16s ease, background .16s ease }
+.pane .thing:hover { transform: translateY(-3px) rotate(-1deg); background: #f0e8ff }
+
+.dock {
+  background: #201a32 !important;
+  border: 2px solid #b8ef72 !important;
+  border-radius: 19px 7px 19px 7px !important;
+  box-shadow: 8px 9px 0 rgba(43, 24, 70, .2) !important;
+}
+.dock .slot{ color:#f2eaff }
+.dock .slot { border-radius: 12px 5px 12px 5px !important }
+.dock .slot:hover { background: #8b5ee8 !important; transform: translateY(-7px) rotate(-2deg) !important }
+.dock .slot .mark { color: #b8ef72 !important; border-bottom-color: #b8ef72 }
+.toast { border: 2px solid #201a32 !important; border-radius: 12px 4px 12px 4px !important; box-shadow: 4px 4px 0 #b8ef72 !important; background:#201a32; color:#f2eaff }
+.terminal { background: #201a32; color: #f2eaff }
+.terminal .out .accent, .terminal .type span { color: #b8ef72 }
+.webpane { background: #fffaff }
+.webpane h2 { color: #8b5ee8 }
+.pane .notebox{ background:#fffaff; border-color:#c5b4e5 }
+.boxtext{ background:#fffaff; border-color:#c5b4e5 }
+.aboutwrap .bigd { background: #b8ef72 !important; color: #201a32 !important; transform: rotate(-4deg); border-radius: 14px 4px 14px 4px !important; border-color:#201a32 }
+#gearbtn:hover { color: #b8ef72; transform: rotate(18deg) }
+.menu-pop{ background:#fffaff; border-color:#201a32 }
+.menu-pop button:hover{ background:#ded0ff }
+.menu-pop .sep{ background:#c5b4e5 }
+.command-palette{ background:#fffaff; border-color:#201a32 }
+.command-palette form{ border-bottom-color:#c5b4e5 }
+.palette-backdrop .hint{ color:#756786 }
+
+@media (max-width: 700px) {
+  .deskclock { transform: none; } /* the rotation was breaking the layout on mobile */
+  .window { border-radius: 12px; }
+}
+
+
+/* black and white theme */
+:root { --accent: #000000; --orange: #000000; --orange-pale: #eeeeee; }
+html, body, #boot-screen { background: #fff !important; color: #000 !important }
+#desktop { color: #000 !important; }
+.window, .pane, .boxtext, .notebox, .webpane, .toast, .menu-pop, .command-palette,
+.pane .thing:hover, #boot-screen .boot-mark{
+  background-color: #fff !important;
+  color: #000 !important;
+  border-color: #000 !important;
+}
+.windowhead, .menustrip .strip-right, .stamp, .dateline{ background-color:#e5e5e5 !important }
+.menustrip, .dock{ background: #fcf9f9 !important; color: #fff !important; border-color: #fff !important }
+.dock .slot, .dock .slot .mark, #gearbtn, .toast { color: #fff !important }
+.deskclock, .deskclock .dayline, .deskclock .bigtime, .deskclock .bigtime span,
+.deskclock .dateline { color: #000 !important; }
+.dots button{ background:#000 !important; border-color:#fff !important }
+.btn.gobtn, .dock .slot:hover { background: #000 !important; color: #fff !important; border-color: #000 !important }
+.pane .hdr, .webpane h2 { color:#000 !important }
+.terminal { background: #000 !important; color: #fff !important; }
+.terminal .out .accent, .terminal .type span { color: #fff !important }
+::selection { background: #000 !important; color: #fff !important; }
+
+/* final strict monochrome pass: no colored taskbar, dock, clock, or controls */
+:root {
+  --accent: #000000 !important;
+  --orange: #000000 !important;
+  --orange-pale: #ffffff !important;
+}
+html, body, #desktop, #boot-screen { color: #000000 !important; }
+.menustrip, .menustrip *, .menustrip .strip-right,
+.dock, .dock *, #taskbar, .taskbar, #gearbtn,
+#headclock, #headclock *, .menu-pop, .menu-pop *,
+.command-palette, .command-palette *, .deskclock, .deskclock *,
+.toast, .toast *, .btn, button, .swatch, .windowhead, .windowhead *,
+.pane .hdr, .stamp, .dateline {
+  border-color: #000000 !important;
+  box-shadow: none !important;
+}
+.menustrip, .menustrip .strip-right, #taskbar, .taskbar,
+.dock, #gearbtn, .menu-pop, .command-palette {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+.menustrip button, .menustrip a, .menustrip span, .menustrip div,
+.dock .slot, .dock .slot *, #gearbtn, #headclock,
+.menu-pop *, .command-palette * { color: #ffffff !important; }
+.deskclock, .deskclock *, #headclock {
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+button, .btn, .swatch, .windowhead, .pane, .window, .toast,
+.menu-pop, .command-palette, .windowhead button {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+.dock .slot:hover, .dock .slot:focus, .menustrip button:hover,
+.btn.gobtn, button:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
+  outline-color: #000000 !important;
+}
+.swatch { outline: 1px solid #000000 !important; }
+::selection { background: #000000 !important; color: #ffffff !important; }
+
+</style>
+</head>
+<body>
+<div id="boot-screen" aria-label="Starting DasadappleOS" role="status">
+  <div class="boot-content"><div class="boot-mark" aria-hidden="true">✦</div><div class="boot-name" id="boot-name">✦  DasadappleOS  ✦</div><div class="hello">yO wassup.</div></div>
+</div>
+<div id="desktop">
+  <header class="menustrip">
+    <div class="strip-left"><span class="logo">Dasadapple<span style="color:var(--accent)">OS</span></span><span id="active-app">WebOS</span><span class="hide-small" id="headupdate"></span></div>
+    <div class="strip-right"><span id="headclock"></span><button id="gearbtn" aria-label="Open settings">☷</button></div>
+  </header>
+  <aside class="deskclock" aria-label="Desktop clock"><div class="dayline" id="headweekday">WEDNESDAY</div><div class="bigtime" id="widget-time">01<span>:</span>12</div><div class="dateline" id="headmonthday">OCTOBER 21</div></aside>
+  <div id="window-layer"></div>
+  <nav class="dock" aria-label="Application dock">
+    <button class="slot" data-app="Finder"><span class="mark">▦</span><span class="label">Files</span><span class="running"></span></button>
+    <button class="slot" data-app="Browser"><span class="mark">↗</span><span class="label">Browser</span><span class="running"></span></button>
+    <button class="slot" data-app="Notes"><span class="mark">✎</span><span class="label">Notes</span><span class="running"></span></button>
+    <button class="slot" data-app="Terminal"><span class="mark">›_</span><span class="label">Terminal</span><span class="running"></span></button>
+    <button class="slot" data-app="Spotify"><span class="mark">♫</span><span class="label">Spotify</span><span class="running"></span></button>
+    <button class="slot" data-app="About Me"><span class="mark">☺</span><span class="label">About Me</span><span class="running"></span></button>
+    <span class="vrule"></span>
+    <button class="slot" data-app="Settings"><span class="mark">⚙</span><span class="label">Settings</span><span class="running"></span></button>
+  </nav>
+  <div class="toast" id="toast" role="status"></div><div id="window-context" class="menu-pop" hidden></div><div id="command-layer" hidden></div><input id="wallpaper-upload" type="file" accept="image/*">
+</div>
+<script>
+// this part makes the apps and windows do stuff
+(function () {
+
+  var bootScreen = document.getElementById('boot-screen');
+  var bootName = document.getElementById('boot-name');
+  var hello = document.querySelector('.hello');
+
+  // the boot thing plays once then removes itself, timings found by eye
+  if (bootScreen) {
+    setTimeout(function () {
+      if (bootName) bootName.classList.add('hide');
+      bootScreen.classList.add('hello-phase');
+      if (hello) hello.classList.add('show');
+    }, 1250);
+    setTimeout(function () {
+      bootScreen.classList.add('is-leaving');
+    }, 2450);
+    setTimeout(function () {
+      bootScreen.remove();
+    }, 3050);
+  }
+
+  function $(sel, root) {
+    if (!root) root = document;
+    return root.querySelector(sel);
+  }
+  function $$(sel, root) {
+    if (!root) root = document;
+    return [...root.querySelectorAll(sel)];
+  }
+
+  var windowLayer = $('#window-layer');
+  var windows = new Map();
+  var zCounter = 10;
+  var toastTimer = null;
+  var window_count = 0;
+
+  var appDetails = {
+    Finder: { icon: '▦', title: 'File Manager' },
+    Browser: { icon: '↗', title: 'Browser' },
+    Notes: { icon: '✎', title: 'Notes' },
+    Terminal: { icon: '›_', title: 'Terminal' },
+    Spotify: { icon: '♫', title: 'Spotify Player' },
+    'About Me': { icon: '☺', title: 'About Me' },
+    Settings: { icon: '⚙', title: 'Settings' }
+  };
+
+  // random little lines for the fortune command
+  var thoughts = [
+    'make something and make it better later.',
+    'small details are still details.',
+    'one bug at a time lol.',
+    'good ideas usually start messy.'
+  ];
+
+  function toast(message) {
+    var el = $('#toast');
+    el.textContent = message;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      el.classList.remove('show');
+    }, 2100);
+  }
+
+  function tick() {
+    var now = new Date();
+    var mins = String(now.getMinutes()).padStart(2, '0');
+    var hour24 = String(now.getHours()).padStart(2, '0');
+    var hour12 = now.getHours() % 12 || 12;
+    var deskTime = String(hour12).padStart(2, '0') + ':' + mins;
+
+    $('#headclock').textContent = hour24 + ':' + mins;
+    $('#widget-time').textContent = deskTime;
+    $('#widget-time').innerHTML = deskTime.replace(':', '<span>:</span>');
+
+    $('#headweekday').textContent = now.toLocaleDateString('en-US', {weekday:'long'}).toUpperCase();
+    $('#headmonthday').textContent = now.toLocaleDateString('en-US', {month:'long', day:'2-digit'}).toUpperCase();
+    $('#headupdate').textContent = now.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  // all the window contents. yeah this is long, i might split it later
+  var views = {
+    Terminal: `<div class="terminal"><div class="out" data-output><span class="accent">dasadapple@desktop</span> <span style="color:#c5c4b8">~</span>
+Welcome to DasadappleOS.
+Type <span class="accent">help</span> for commands.
+
+</div><form class="type" data-command-form><span>❯</span><input data-command autocomplete="off" spellcheck="false" placeholder="enter a command..." aria-label="Terminal command"></form></div>`,
+
+    Browser: `<form class="linedup" data-browser-form style="margin-bottom:14px"><input class="boxtext" data-address value="https://DasadappleOs.com" aria-label="Website address"><button class="btn gobtn">Go ↗</button></form><div class="webpane"><h2>Follow the interesting thing.</h2><p>This small launcher opens websites in a new tab, leaving your desktop right where you left it.</p><div class="linedup" style="flex-wrap:wrap;margin-top:16px"><button class="btn" data-site="https://www.wikipedia.org">Wikipedia</button><button class="btn" data-site="https://developer.mozilla.org">MDN</button><button class="btn" data-site="https://open.spotify.com">Spotify</button></div></div><p class="dim tiny">External sites open in a new tab, otherwise nothing renders.</p>`,
+
+    Finder: `<div class="spread" style="margin-bottom:15px"><div><div class="hdr" style="margin-bottom:4px">Your places</div><div class="dim tiny">A tiny set of useful shortcuts</div></div><button class="btn" data-folder>＋ Folder</button></div><div class="things" data-files><div class="thing" data-file="Notes"><div class="mark">✎</div><div class="label">Notepad</div></div><div class="thing" data-file="Terminal"><div class="mark">›_</div><div class="label">Terminal</div></div><div class="thing" data-file="Browser"><div class="mark">↗</div><div class="label">Browser</div></div><div class="thing" data-file="Spotify"><div class="mark">♫</div><div class="label">Spotify Playlist</div></div><div class="thing" data-file="Settings"><div class="mark">⚙</div><div class="label">Preferences</div></div><div class="thing" data-file="About Me"><div class="mark">☺</div><div class="label">About Me</div></div></div><p class="dim tiny" style="margin-top:18px">Double-click an item to open it. This is a desktop simulation, not your actual files.</p>`,
+
+    Notes: `<div class="spread" style="margin-bottom:10px"><div><div class="hdr" style="margin-bottom:4px">Notepad</div><div class="dim tiny">Saved in this browser, on this device.</div></div><span style="color:var(--orange)">✎</span></div><textarea class="note-area" data-note placeholder="A thought, a plan, a tiny dream…&#10;&#10;Start anywhere."></textarea><div class="note-foot"><span data-save-status>Ready when you are</span><button class="btn" data-clear>Clear note</button></div>`,
+
+    Spotify: `<div class="hdr">One of my Spotify playlist</div><p class="dim tiny" style="margin:-4px 0 13px">Playlist embedded from Spotify. Sign in if playback asks.</p><iframe class="spotify-frame" src="https://open.spotify.com/embed/playlist/69wnpvx13yjxzN0pt0Q0u4?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Spotify playlist"></iframe>`,
+
+    'About Me': `<div class="aboutwrap"><div class="bigd">D.</div><div><div class="hdr">Something About me</div><h2 style="font:650 30px/1.02 Fraunces,serif;letter-spacing:-.04em;margin:7px 0 12px">Hello, I'm HostApple.</h2><p class="dim" style="line-height:1.8">DasadappleOS is my small corner of the web — a WebOS for experimenting, collecting ideas, listening to music and making things feel a little more personal.</p><p style="line-height:1.8">I like this interface . It is clean but there are some bugs that I still have to fix such as the dock color bug . The icon names color doesnt show untill you hover , that was not intended so I will try to fix it soon.</p><div class="notebox" style="margin-top:14px"><p style="margin:0;line-height:1.8">Just a small little project for HackClub Stardance Challenge</p></div><p class="dim tiny" style="margin-top:14px"></p></div></div>`,
+
+    Settings: `<div class="hdr">Make it yours</div><div class="prefline"><div><strong>Accent color</strong><div class="dim tiny" style="margin-top:4px">Pick a little character</div></div><div class="linedup"><button class="swatch picked" data-color="#000000" style="background:#000000" aria-label="Black"></button><button class="swatch" data-color="#ffffff" style="background:#ffffff" aria-label="White"></button></div></div><div class="prefline"><div><strong>Use your own wallpaper</strong><div class="dim tiny" style="margin-top:4px">Choose an image from your device</div></div><button class="btn" data-upload>Choose image</button></div><div class="prefline"><div><strong>Restore paper background</strong><div class="dim tiny" style="margin-top:4px">Return to the original desktop</div></div><button class="btn" data-reset-wallpaper>Reset</button></div><div class="notebox" style="margin-top:16px"><h2 style="font:650 23px Fraunces,serif;margin:9px 0">A workbench for your brain.</h2><p class="dim tiny" style="line-height:1.7;margin-bottom:0">No account, no password, no pressure. Just open it and explore.</p></div>`
+  };
+
+  function openApp(name) {
+    // files and file manager mean the same thing, just easier to type
+    if (name === 'Files' || name === 'File Manager') name = 'Finder';
+    if (!appDetails[name]) {
+      toast('umm app not found');
+      return;
+    }
+
+    // already open? just bring it back to the front instead of making a new one
+    if (windows.has(name)) {
+      var existing = windows.get(name);
+      existing.classList.remove('hidden');
+      zCounter = zCounter + 1;
+      existing.style.zIndex = zCounter;
+      $('#active-app').textContent = appDetails[name].title;
+      syncDock();
+      return;
+    }
+
+    var win = document.createElement('section');
+    win.className = 'window';
+    win.dataset.app = name;
+    zCounter = zCounter + 1;
+    win.style.zIndex = zCounter;
+
+    var n = window_count;
+    window_count = window_count + 1;
+
+    // the little offset so they don't all stack exactly on top of each other
+    var leftPos = 95 + n * 24;
+    if (leftPos > innerWidth - 530) leftPos = innerWidth - 530;
+    if (leftPos < 12) leftPos = 12;
+    win.style.left = leftPos + 'px';
+
+    var topPos = 82 + n * 22;
+    if (topPos > innerHeight - 450) topPos = innerHeight - 450;
+    if (topPos < 55) topPos = 55;
+    win.style.top = topPos + 'px';
+
+    if (innerWidth < 700) {
+      win.style.left = '12px';
+      win.style.top = (55 + Math.min(n * 12, 70)) + 'px';
+      win.style.width = 'calc(100vw - 24px)';
+      win.style.height = 'min(510px, calc(100vh - 160px))';
+    }
+
+    win.innerHTML = `<div class="windowhead"><div class="dots"><button data-close aria-label="Close"></button><button data-minimize aria-label="Minimize"></button><button data-maximize aria-label="Maximize"></button></div><div class="windowname">${appDetails[name].icon} &nbsp; ${appDetails[name].title}</div><span class="stamp">DASADAPPLEOS</span></div><div class="pane">${views[name]}</div>`;
+
+    windowLayer.appendChild(win);
+    windows.set(name, win);
+    $('#active-app').textContent = appDetails[name].title;
+    syncDock();
+
+    win.addEventListener('pointerdown', function () {
+      zCounter = zCounter + 1;
+      win.style.zIndex = zCounter;
+      $('#active-app').textContent = appDetails[name].title;
+    });
+
+    makeDraggable(win);
+
+    win.addEventListener('contextmenu', function (ev) {
+      ev.preventDefault();
+      showWindowMenu(ev.clientX, ev.clientY, name, win);
+    });
+
+    $('[data-close]', win).onclick = function () {
+      win.remove();
+      windows.delete(name);
+      syncDock();
+      $('#active-app').textContent = 'Desktop';
+    };
+
+    $('[data-minimize]', win).onclick = function () {
+      win.classList.add('hidden');
+      toast('Minimized - click the dock icon to bring it back.');
+    };
+
+    $('[data-maximize]', win).onclick = function () {
+      win.classList.toggle('maximized');
+    };
+
+    if (name === 'Terminal') setupTerminal(win);
+    if (name === 'Notes') setupNotes(win);
+    if (name === 'Browser') setupBrowser(win);
+    if (name === 'Finder') setupFinder(win);
+    if (name === 'Settings') setupSettings(win);
+  }
+
+  function makeDraggable(win) {
+    var bar = $('.windowhead', win);
+    var grab = null;
+
+    bar.addEventListener('pointerdown', function (evt) {
+      if (evt.target.closest('button')) return;
+      if (win.classList.contains('maximized')) return;
+      var rect = win.getBoundingClientRect();
+      grab = { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+      bar.setPointerCapture(evt.pointerId);
+    });
+
+    bar.addEventListener('pointermove', function (evt) {
+      if (!grab) return;
+      var newX = evt.clientX - grab.x;
+      if (newX < 0) newX = 0;
+      if (newX > innerWidth - win.offsetWidth) newX = innerWidth - win.offsetWidth;
+      win.style.left = newX + 'px';
+
+      var newY = evt.clientY - grab.y;
+      if (newY < 43) newY = 43;              // 43 = height of the strip, don't drag under it
+      if (newY > innerHeight - 100) newY = innerHeight - 100;
+      win.style.top = newY + 'px';
+    });
+
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (type) {
+      bar.addEventListener(type, function () { grab = null; });
+    });
+  }
+
+  function syncDock() {
+    $$('.slot').forEach(function (button) {
+      if (windows.has(button.dataset.app)) button.classList.add('open');
+      else button.classList.remove('open');
+    });
+  }
+
+  function setupTerminal(win) {
+    var output = $('[data-output]', win);
+    var form = $('[data-command-form]', win);
+    var input = $('[data-command]', win);
+
+    function say(message, kind) {
+      var line = document.createElement('div');
+      if (kind) line.className = kind;
+      line.textContent = message;
+      output.appendChild(line);
+      output.scrollTop = output.scrollHeight;
+    }
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      var command = input.value.trim();
+      if (!command) return;
+
+      say('❯ ' + command);
+      input.value = '';
+
+      var bits = command.split(' ');
+      var word = bits.shift().toLowerCase();
+      var arg = bits.join(' ');
+
+      // this got long but honestly an if/else is easier to add to than a table
+      if (word === 'help') {
+        say('Commands: help, about, date, clear, echo, apps, open, whoami, fortune');
+      } else if (word === 'about') {
+        say('DasadappleOS is my little web desktop thing.');
+      } else if (word === 'date') {
+        say(new Date().toString());
+      } else if (word === 'clear') {
+        output.replaceChildren();
+      } else if (word === 'echo') {
+        say(arg);
+      } else if (word === 'apps') {
+        say('Browser, File Manager, Notes, Settings, Spotify, Terminal, About Me');
+      } else if (word === 'whoami') {
+        say('a curious human');
+      } else if (word === 'fortune') {
+        var pick = Math.floor(Math.random() * thoughts.length);
+        say(thoughts[pick]);
+      } else if (word === 'open') {
+        var wanted = arg.toLowerCase();
+        var match = null;
+        for (var appName in appDetails) {
+          var key = appName.toLowerCase();
+          var title = appDetails[appName].title.toLowerCase();
+          if (key === wanted || title === wanted) {
+            match = appName;
+            break;
+          }
+        }
+        if (match) {
+          openApp(match);
+          say('Opening ' + appDetails[match].title + '...', 'good');
+        } else {
+          say('cant find that app lol. type apps');
+        }
+      } else {
+        say('no idea what that command is. try help');
+      }
+    };
+    input.focus();
+  }
+
+  function setupNotes(win) {
+    var note = $('[data-note]', win);
+    var status = $('[data-save-status]', win);
+
+    try {
+      note.value = localStorage.getItem('dasadapple-note') || '';
+    } catch (err) {
+      status.textContent = 'Could not load saved no';
+    }
+
+    var save_timer = null;
+    note.addEventListener('input', function () {
+      status.textContent = 'Saving...';
+      // wait a bit so we don't write to storage on every keystroke
+      clearTimeout(save_timer);
+      save_timer = setTimeout(function () {
+        try {
+          localStorage.setItem('dasadapple-note', note.value);
+          status.textContent = 'Saved on this device ✓';
+        } catch (err) {
+          status.textContent = 'Browser storage is unavailable';
+        }
+      }, 220);
+    });
+
+    $('[data-clear]', win).onclick = function () {
+      if (!confirm('Clear this note?')) return;
+      note.value = '';
+      note.dispatchEvent(new Event('input'));
+    };
+  }
+
+  function setupBrowser(win) {
+    var address = $('[data-address]', win);
+
+    function visit() {
+      var url = address.value.trim();
+      if (!url) return;
+      if (!/^https?:\/\//i.test(url)) {
+        if (url.includes('.')) url = 'https://' + url;
+        else url = 'https://www.google.com/' + encodeURIComponent(url);
+      }
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    $('[data-browser-form]', win).onsubmit = function (e) {
+      e.preventDefault();
+      visit();
+    };
+
+    $$('[data-site]', win).forEach(function (button) {
+      button.onclick = function () {
+        address.value = button.dataset.site;
+        visit();
+      };
+    });
+  }
+
+  function setupFinder(win) {
+    $$('[data-file]', win).forEach(function (file) {
+      file.ondblclick = function () { openApp(file.dataset.file); };
+    });
+
+    $('[data-folder]', win).onclick = function () {
+      var folderName = prompt('What should this folder be called?');
+      if (!folderName || !folderName.trim()) return;
+
+      var item = document.createElement('div');
+      item.className = 'thing';
+      var glyph = document.createElement('div');
+      glyph.className = 'mark';
+      glyph.textContent = '▱';
+      var name = document.createElement('div');
+      name.className = 'label';
+      name.textContent = folderName.trim();
+      item.append(glyph, name);
+
+      // these folders don't save anywhere, they disappear on refresh
+      $('[data-files]', win).appendChild(item);
+      toast('added a folder idea: ' + folderName);
+    };
+  }
+
+  function setupSettings(win) {
+    $$('[data-color]', win).forEach(function (button) {
+      button.onclick = function () {
+        var color = button.dataset.color;
+        document.documentElement.style.setProperty('--orange', color);
+        document.documentElement.style.setProperty('--accent', color);
+        document.documentElement.style.setProperty('--orange-pale', color + '55');
+        $$('[data-color]', win).forEach(function (chip) {
+          if (chip === button) chip.classList.add('picked');
+          else chip.classList.remove('picked');
+        });
+        toast('accent changed');
+      };
+    });
+
+    $('[data-upload]', win).onclick = function () {
+      $('#wallpaper-upload').click();
+    };
+
+    $('[data-reset-wallpaper]', win).onclick = function () {
+      $('#desktop').style.backgroundImage = '';
+      $('#desktop').style.backgroundColor = '#ffffff';
+      $('#desktop').style.backgroundSize = 'cover';
+      $('#desktop').style.backgroundPosition = 'center';
+      toast('background reset');
+    };
+  }
+
+  // ctrl+k bar talks to this
+  function runDesktopCommand(raw) {
+    var command = raw.trim();
+    if (!command) return 'type something first';
+
+    var lower = command.toLowerCase();
+
+    var appName = null;
+    for (var key in appDetails) {
+      var k = key.toLowerCase();
+      var t = appDetails[key].title.toLowerCase();
+      if (lower === k || lower === t || lower === 'open ' + k || lower === 'open ' + t) {
+        appName = key;
+        break;
+      }
+    }
+    if (appName) {
+      openApp(appName);
+      return 'Opened ' + appDetails[appName].title + '.';
+    }
+
+    if (lower === 'help' || lower === 'what can you do?' || lower === 'what apps are available?') {
+      return 'Try "open notes", "open spotify", "open settings", "open about me", or "open terminal". Ctrl/⌘ + K opens this command bar.';
+    }
+    if (lower.startsWith('search ')) {
+      var q = command.slice(7);
+      window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank', 'noopener,noreferrer');
+      return 'search opened in a new tab';
+    }
+    if (lower.startsWith('note ')) {
+      openApp('Notes');
+      return 'Notes is open. Copy this into your notepad: ' + command.slice(5);
+    }
+    return 'this is just local desktop mode rn. try help or open an app';
+  }
+
+  function showWindowMenu(x, y, name, win) {
+    var menu = $('#window-context');
+    var maximizeText = win.classList.contains('maximized') ? 'Restore size' : 'Maximize';
+
+    menu.innerHTML = `<button data-menu="restore">Bring to front</button><button data-menu="minimize">Minimize</button><button data-menu="maximize">${maximizeText}</button><div class="sep"></div><button data-menu="settings">Desktop settings</button><button class="nope" data-menu="close">Close window</button>`;
+    menu.hidden = false;
+
+    var px = Math.min(x, innerWidth - 190);
+    if (px < 0) px = 0;
+    menu.style.left = px + 'px';
+
+    var py = Math.min(y, innerHeight - 210);
+    if (py < 35) py = 35;
+    menu.style.top = py + 'px';
+
+    menu.onclick = function (e) {
+      var hit = e.target.closest('[data-menu]');
+      if (!hit) return;
+      var action = hit.dataset.menu;
+      menu.hidden = true;
+
+      if (action === 'restore') {
+        win.classList.remove('hidden');
+        zCounter = zCounter + 1;
+        win.style.zIndex = zCounter;
+      }
+      if (action === 'minimize') win.classList.add('hidden');
+      if (action === 'maximize') win.classList.toggle('maximized');
+      if (action === 'settings') openApp('Settings');
+      if (action === 'close') {
+        win.remove();
+        windows.delete(name);
+        syncDock();
+      }
+    };
+  }
+
+  function openCommandPalette() {
+    var host = $('#command-layer');
+    host.hidden = false;
+    host.className = 'palette-backdrop';
+    host.innerHTML = `<div class="command-palette"><form data-palette-form><input data-palette-input placeholder="Open an app or search the web..." autocomplete="off" aria-label="Global command"><button class="btn gobtn">Go ↗</button></form><div class="hint">ENTER to run · ESC to close · Try "open notes" or "search typography"</div></div>`;
+
+    var input = $('[data-palette-input]', host);
+    input.focus();
+
+    $('[data-palette-form]', host).onsubmit = function (e) {
+      e.preventDefault();
+      var value = input.value.trim();
+      if (value) toast(runDesktopCommand(value));
+      host.hidden = true;
+    };
+
+    // clicking the dim part behind it closes the palette
+    host.onclick = function (e) {
+      if (e.target === host) host.hidden = true;
+    };
+  }
+
+  $('#gearbtn').onclick = function () { openApp('Settings'); };
+
+  $$('.slot').forEach(function (button) {
+    button.onclick = function () { openApp(button.dataset.app); };
+  });
+
+  $('#wallpaper-upload').addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast('please pick an image file');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function () {
+      $('#desktop').style.backgroundImage = 'url("' + reader.result + '")';
+      $('#desktop').style.backgroundSize = 'cover';
+      $('#desktop').style.backgroundPosition = 'center';
+      toast('wallpaper changed!');
+    };
+    reader.onerror = function () { toast('could not load that image'); };
+    reader.readAsDataURL(file);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      openCommandPalette();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.code === 'Space') {
+      e.preventDefault();
+      openApp('Terminal');
+    }
+    if (e.key === 'Escape') {
+      $('#command-layer').hidden = true;
+      $('#window-context').hidden = true;
+    }
+  });
+
+  document.addEventListener('pointerdown', function (e) {
+    var menu = $('#window-context');
+    if (!menu.contains(e.target)) menu.hidden = true;
+  });
+
+  // if the window goes off screen after a resize, pull it back in
+  window.addEventListener('resize', function () {
+    $$('.window:not(.maximized)').forEach(function (win) {
+      var r = win.getBoundingClientRect();
+      if (r.right > innerWidth) {
+        var x = innerWidth - win.offsetWidth - 10;
+        if (x < 0) x = 0;
+        win.style.left = x + 'px';
+      }
+      if (r.bottom > innerHeight - 85) {
+        var y = innerHeight - win.offsetHeight - 100;
+        if (y < 43) y = 43;
+        win.style.top = y + 'px';
+      }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

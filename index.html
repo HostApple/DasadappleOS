@@ -295,6 +295,12 @@ button, .btn, .swatch, .windowhead, .pane, .window, .toast,
 .swatch { outline: 1px solid #000000 !important; }
 ::selection { background: #000000 !important; color: #ffffff !important; }
 
+/* maps app - bolted on without touching the rest lol */
+.maps-wrap{display:flex;flex-direction:column;gap:10px;height:100%;min-height:250px}
+.maps-search{display:flex;gap:8px;flex-wrap:wrap}
+.maps-search .boxtext{flex:1;min-width:150px}
+.maps-frame{width:100%;flex:1;min-height:230px;border:1.5px solid #000;background:#eee}
+.maps-hint{font-size:10px;color:#666;margin:0}
 </style>
 </head>
 <body>
@@ -311,6 +317,7 @@ button, .btn, .swatch, .windowhead, .pane, .window, .toast,
   <nav class="dock" aria-label="Application dock">
     <button class="slot" data-app="Finder"><span class="mark">▦</span><span class="label">Files</span><span class="running"></span></button>
     <button class="slot" data-app="Browser"><span class="mark">↗</span><span class="label">Browser</span><span class="running"></span></button>
+    <button class="slot" data-app="Maps"><span class="mark">⌖</span><span class="label">Maps</span><span class="running"></span></button>
     <button class="slot" data-app="Notes"><span class="mark">✎</span><span class="label">Notes</span><span class="running"></span></button>
     <button class="slot" data-app="Terminal"><span class="mark">›_</span><span class="label">Terminal</span><span class="running"></span></button>
     <button class="slot" data-app="Spotify"><span class="mark">♫</span><span class="label">Spotify</span><span class="running"></span></button>
@@ -361,6 +368,7 @@ button, .btn, .swatch, .windowhead, .pane, .window, .toast,
   var appDetails = {
     Finder: { icon: '▦', title: 'File Manager' },
     Browser: { icon: '↗', title: 'Browser' },
+    Maps: { icon: '⌖', title: 'Maps' },
     Notes: { icon: '✎', title: 'Notes' },
     Terminal: { icon: '›_', title: 'Terminal' },
     Spotify: { icon: '♫', title: 'Spotify Player' },
@@ -413,6 +421,7 @@ Type <span class="accent">help</span> for commands.
 </div><form class="type" data-command-form><span>❯</span><input data-command autocomplete="off" spellcheck="false" placeholder="enter a command..." aria-label="Terminal command"></form></div>`,
 
     Browser: `<form class="linedup" data-browser-form style="margin-bottom:14px"><input class="boxtext" data-address value="https://DasadappleOs.com" aria-label="Website address"><button class="btn gobtn">Go ↗</button></form><div class="webpane"><h2>Follow the interesting thing.</h2><p>This small launcher opens websites in a new tab, leaving your desktop right where you left it.</p><div class="linedup" style="flex-wrap:wrap;margin-top:16px"><button class="btn" data-site="https://www.wikipedia.org">Wikipedia</button><button class="btn" data-site="https://developer.mozilla.org">MDN</button><button class="btn" data-site="https://open.spotify.com">Spotify</button></div></div><p class="dim tiny">External sites open in a new tab, otherwise nothing renders.</p>`,
+    Maps: `<div class="maps-wrap"><div><div class="hdr" style="margin-bottom:5px">Maps / touch grass simulator</div><p class="maps-hint">search a place, hit go, and pretend we're productive</p></div><form class="maps-search" data-maps-form><input class="boxtext" data-maps-query placeholder="Search a place or address..." aria-label="Search map location" value="Dhaka, Bangladesh"><button class="btn gobtn">Go ↗</button><button class="btn" type="button" data-directions>Directions ↗</button></form><iframe class="maps-frame" data-map-frame src="https://www.google.com/maps?q=Dhaka%2C%20Bangladesh&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Interactive Google Map"></iframe><p class="maps-hint">Map data loads from Google Maps. If it refuses to embed, use Directions to open the full map.</p></div>`,
 
     Finder: `<div class="spread" style="margin-bottom:15px"><div><div class="hdr" style="margin-bottom:4px">Your places</div><div class="dim tiny">A tiny set of useful shortcuts</div></div><button class="btn" data-folder>＋ Folder</button></div><div class="things" data-files><div class="thing" data-file="Notes"><div class="mark">✎</div><div class="label">Notepad</div></div><div class="thing" data-file="Terminal"><div class="mark">›_</div><div class="label">Terminal</div></div><div class="thing" data-file="Browser"><div class="mark">↗</div><div class="label">Browser</div></div><div class="thing" data-file="Spotify"><div class="mark">♫</div><div class="label">Spotify Playlist</div></div><div class="thing" data-file="Settings"><div class="mark">⚙</div><div class="label">Preferences</div></div><div class="thing" data-file="About Me"><div class="mark">☺</div><div class="label">About Me</div></div></div><p class="dim tiny" style="margin-top:18px">Double-click an item to open it. This is a desktop simulation, not your actual files.</p>`,
 
@@ -510,6 +519,7 @@ Type <span class="accent">help</span> for commands.
     if (name === 'Terminal') setupTerminal(win);
     if (name === 'Notes') setupNotes(win);
     if (name === 'Browser') setupBrowser(win);
+    if (name === 'Maps') setupMaps(win);
     if (name === 'Finder') setupFinder(win);
     if (name === 'Settings') setupSettings(win);
   }
@@ -588,7 +598,7 @@ Type <span class="accent">help</span> for commands.
       } else if (word === 'echo') {
         say(arg);
       } else if (word === 'apps') {
-        say('Browser, File Manager, Notes, Settings, Spotify, Terminal, About Me');
+        say('Browser, Maps, File Manager, Notes, Settings, Spotify, Terminal, About Me');
       } else if (word === 'whoami') {
         say('a curious human');
       } else if (word === 'fortune') {
@@ -676,6 +686,35 @@ Type <span class="accent">help</span> for commands.
     });
   }
 
+  function setupMaps(win) {
+    var form = $('[data-maps-form]', win);
+    var query = $('[data-maps-query]', win);
+    var frame = $('[data-map-frame]', win);
+
+    function mapIt() {
+      var place = query.value.trim();
+      if (!place) {
+        toast('type a place first lol');
+        return;
+      }
+      frame.src = 'https://www.google.com/maps?q=' + encodeURIComponent(place) + '&output=embed';
+    }
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      mapIt();
+    };
+
+    $('[data-directions]', win).onclick = function () {
+      var place = query.value.trim();
+      if (!place) {
+        toast('where we going tho');
+        return;
+      }
+      window.open('https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(place), '_blank', 'noopener,noreferrer');
+    };
+  }
+
   function setupFinder(win) {
     $$('[data-file]', win).forEach(function (file) {
       file.ondblclick = function () { openApp(file.dataset.file); };
@@ -729,7 +768,7 @@ Type <span class="accent">help</span> for commands.
     };
   }
 
-  // ctrl+k bar talks to this
+  // cntrl + k currently under working
   function runDesktopCommand(raw) {
     var command = raw.trim();
     if (!command) return 'type something first';
@@ -751,7 +790,7 @@ Type <span class="accent">help</span> for commands.
     }
 
     if (lower === 'help' || lower === 'what can you do?' || lower === 'what apps are available?') {
-      return 'Try "open notes", "open spotify", "open settings", "open about me", or "open terminal". Ctrl/⌘ + K opens this command bar.';
+      return 'Try "open notes", "open maps", "open spotify", "open settings", "open about me", or "open terminal". Ctrl/⌘ + K opens this command bar.';
     }
     if (lower.startsWith('search ')) {
       var q = command.slice(7);
@@ -818,7 +857,7 @@ Type <span class="accent">help</span> for commands.
       host.hidden = true;
     };
 
-    // clicking the dim part behind it closes the palette
+    // clicking the dim part behind it closes the shi
     host.onclick = function (e) {
       if (e.target === host) host.hidden = true;
     };
@@ -886,6 +925,6 @@ Type <span class="accent">help</span> for commands.
   });
 
 })();
-</script>
+</script> 
 </body>
-</html>
+</html>  

@@ -1,8 +1,3 @@
-<!--
-DasadappleOS
-The HTML, CSS and JS were put in one file because that is easier for me to work on.
-The code isn't super organized yet, but it is all here in one place.
--->
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,6 +5,73 @@ The code isn't super organized yet, but it is all here in one place.
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#000000">
 <title>✦  DasadappleOS  ✦</title>
+</head>
+<body>
+<div id="boot-screen" aria-label="Starting DasadappleOS" role="status">
+  <div class="boot-content"><div class="boot-mark" aria-hidden="true">✦</div><div class="boot-name" id="boot-name">✦  DasadappleOS  ✦</div><div class="hello">yO wassup.</div></div>
+</div>
+<div id="desktop">
+  <header class="menustrip">
+    <div class="strip-left">
+      <span class="logo">Dasadapple<span style="color:var(--accent)">OS</span></span>
+      <span id="active-app">WebOS</span><span class="hide-small" id="headupdate">
+      </span>
+    </div>
+    <div class="strip-right"><span id="headclock"></span>
+      <button id="gearbtn" aria-label="Open settings">☷</button>
+    </div>
+  </header>
+  <aside class="deskclock" aria-label="Desktop clock"><div class="dayline" id="headweekday">WEDNESDAY</div><div class="bigtime" id="widget-time">01<span>:</span>12</div><div class="dateline" id="headmonthday">OCTOBER 21</div></aside>
+  <div id="window-layer"></div>
+  <nav class="dock" aria-label="Application dock">
+    <button class="slot" data-app="Finder">
+      <span class="mark">▦</span>
+      <span class="label">Files</span>
+      <span class="running"></span>
+    </button>
+    <button class="slot" data-app="Browser">
+      <span class="mark">↗</span>
+      <span class="label">Browser</span>
+      <span class="running"></span>
+    </button>
+    <button class="slot" data-app="Maps">
+      <span class="mark">⌖</span>
+      <span class="label">Maps</span>
+      <span class="running"></span>
+    </button>
+    <button class="slot" data-app="Notes">
+      <span class="mark">✎</span>
+      <span class="label">Notes</span>
+      <span class="running"></span>
+    </button>
+    <button class="slot" data-app="Terminal">
+      <span class="mark">›_</span>
+      <span class="label">Terminal</span>
+      <span class="running"></span>
+    </button>
+    <button class="slot" data-app="Spotify">
+      <span class="mark">♫</span>
+      <span class="label">Spotify</span>
+      <span class="running"></span>
+    </button>
+    <button class="slot" data-app="About Me">
+      <span class="mark">☺</span>
+      <span class="label">About Me</span>
+      <span class="running"></span>
+    </button>
+    <span class="vrule"></span>
+    <button class="slot" data-app="Settings"><span class="mark">⚙</span><span class="label">Settings</span><span class="running"></span></button>
+  </nav>
+  <div class="toast" id="toast" role="status"></div><div id="window-context" class="menu-pop" hidden></div><div id="command-layer" hidden></div><input id="wallpaper-upload" type="file" accept="image/*">
+</div>
+
+
+
+
+
+
+
+<!--css part frm here-->
 <style>
 /* colors + the desktop styles */
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Urbanist:wght@400;500;600;700;800&display=swap');
@@ -302,31 +364,23 @@ button, .btn, .swatch, .windowhead, .pane, .window, .toast,
 .maps-frame{width:100%;flex:1;min-height:230px;border:1.5px solid #000;background:#eee}
 .maps-hint{font-size:10px;color:#666;margin:0}
 </style>
-</head>
-<body>
-<div id="boot-screen" aria-label="Starting DasadappleOS" role="status">
-  <div class="boot-content"><div class="boot-mark" aria-hidden="true">✦</div><div class="boot-name" id="boot-name">✦  DasadappleOS  ✦</div><div class="hello">yO wassup.</div></div>
-</div>
-<div id="desktop">
-  <header class="menustrip">
-    <div class="strip-left"><span class="logo">Dasadapple<span style="color:var(--accent)">OS</span></span><span id="active-app">WebOS</span><span class="hide-small" id="headupdate"></span></div>
-    <div class="strip-right"><span id="headclock"></span><button id="gearbtn" aria-label="Open settings">☷</button></div>
-  </header>
-  <aside class="deskclock" aria-label="Desktop clock"><div class="dayline" id="headweekday">WEDNESDAY</div><div class="bigtime" id="widget-time">01<span>:</span>12</div><div class="dateline" id="headmonthday">OCTOBER 21</div></aside>
-  <div id="window-layer"></div>
-  <nav class="dock" aria-label="Application dock">
-    <button class="slot" data-app="Finder"><span class="mark">▦</span><span class="label">Files</span><span class="running"></span></button>
-    <button class="slot" data-app="Browser"><span class="mark">↗</span><span class="label">Browser</span><span class="running"></span></button>
-    <button class="slot" data-app="Maps"><span class="mark">⌖</span><span class="label">Maps</span><span class="running"></span></button>
-    <button class="slot" data-app="Notes"><span class="mark">✎</span><span class="label">Notes</span><span class="running"></span></button>
-    <button class="slot" data-app="Terminal"><span class="mark">›_</span><span class="label">Terminal</span><span class="running"></span></button>
-    <button class="slot" data-app="Spotify"><span class="mark">♫</span><span class="label">Spotify</span><span class="running"></span></button>
-    <button class="slot" data-app="About Me"><span class="mark">☺</span><span class="label">About Me</span><span class="running"></span></button>
-    <span class="vrule"></span>
-    <button class="slot" data-app="Settings"><span class="mark">⚙</span><span class="label">Settings</span><span class="running"></span></button>
-  </nav>
-  <div class="toast" id="toast" role="status"></div><div id="window-context" class="menu-pop" hidden></div><div id="command-layer" hidden></div><input id="wallpaper-upload" type="file" accept="image/*">
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--JAVASCRIPT part frm here-->
+
+  
 <script>
 // this part makes the apps and windows do stuff
 (function () {
@@ -420,18 +474,58 @@ Type <span class="accent">help</span> for commands.
 
 </div><form class="type" data-command-form><span>❯</span><input data-command autocomplete="off" spellcheck="false" placeholder="enter a command..." aria-label="Terminal command"></form></div>`,
 
-    Browser: `<form class="linedup" data-browser-form style="margin-bottom:14px"><input class="boxtext" data-address value="https://DasadappleOs.com" aria-label="Website address"><button class="btn gobtn">Go ↗</button></form><div class="webpane"><h2>Follow the interesting thing.</h2><p>This small launcher opens websites in a new tab, leaving your desktop right where you left it.</p><div class="linedup" style="flex-wrap:wrap;margin-top:16px"><button class="btn" data-site="https://www.wikipedia.org">Wikipedia</button><button class="btn" data-site="https://developer.mozilla.org">MDN</button><button class="btn" data-site="https://open.spotify.com">Spotify</button></div></div><p class="dim tiny">External sites open in a new tab, otherwise nothing renders.</p>`,
-    Maps: `<div class="maps-wrap"><div><div class="hdr" style="margin-bottom:5px">Maps / touch grass simulator</div><p class="maps-hint">search a place, hit go, and pretend we're productive</p></div><form class="maps-search" data-maps-form><input class="boxtext" data-maps-query placeholder="Search a place or address..." aria-label="Search map location" value="Dhaka, Bangladesh"><button class="btn gobtn">Go ↗</button><button class="btn" type="button" data-directions>Directions ↗</button></form><iframe class="maps-frame" data-map-frame src="https://www.google.com/maps?q=Dhaka%2C%20Bangladesh&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Interactive Google Map"></iframe><p class="maps-hint">Map data loads from Google Maps. If it refuses to embed, use Directions to open the full map.</p></div>`,
+    Browser: `<form class="linedup" data-browser-form style="margin-bottom:14px">
+    <input class="boxtext" data-address value="https://DasadappleOs.com" aria-label="Website address">
+    <button class="btn gobtn">Go ↗</button></form><div class="webpane"><h2>Follow the interesting thing.</h2>
+    <p>This small launcher opens websites in a new tab, leaving your desktop right where you left it.</p>
+    <div class="linedup" style="flex-wrap:wrap;margin-top:16px"><button class="btn" data-site="https://www.wikipedia.org">Wikipedia</button><button class="btn" data-site="https://developer.mozilla.org">MDN</button>
+    <button class="btn" data-site="https://open.spotify.com">Spotify</button>
+    </div>
+    </div>
+    <p class="dim tiny">External sites open in a new tab, otherwise nothing renders.</p>`,
+    Maps: `<div class="maps-wrap"><div><div class="hdr" style="margin-bottom:5px">Maps / touch grass simulator</div><p class="maps-hint">search a place, hit go, and pretend we're productive</p>
+    </div><form class="maps-search" data-maps-form><input class="boxtext" data-maps-query placeholder="Search a place or address..." aria-label="Search map location" value="Dhaka, Bangladesh"
+    ><button class="btn gobtn">Go ↗</button>
+    <button class="btn" type="button" data-directions>Directions ↗</button>
+    </form>
+    <iframe class="maps-frame" data-map-frame src="https://www.google.com/maps?q=Dhaka%2C%20Bangladesh&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Interactive Google Map"></iframe>
+    <p class="maps-hint">Map data loads from Google Maps. If it refuses to embed, use Directions to open the full map.</p>
+    </div>`,
 
-    Finder: `<div class="spread" style="margin-bottom:15px"><div><div class="hdr" style="margin-bottom:4px">Your places</div><div class="dim tiny">A tiny set of useful shortcuts</div></div><button class="btn" data-folder>＋ Folder</button></div><div class="things" data-files><div class="thing" data-file="Notes"><div class="mark">✎</div><div class="label">Notepad</div></div><div class="thing" data-file="Terminal"><div class="mark">›_</div><div class="label">Terminal</div></div><div class="thing" data-file="Browser"><div class="mark">↗</div><div class="label">Browser</div></div><div class="thing" data-file="Spotify"><div class="mark">♫</div><div class="label">Spotify Playlist</div></div><div class="thing" data-file="Settings"><div class="mark">⚙</div><div class="label">Preferences</div></div><div class="thing" data-file="About Me"><div class="mark">☺</div><div class="label">About Me</div></div></div><p class="dim tiny" style="margin-top:18px">Double-click an item to open it. This is a desktop simulation, not your actual files.</p>`,
+    Finder: `<div class="spread" style="margin-bottom:15px"><div>
+    <div class="hdr" style="margin-bottom:4px">Your places</div>
+    <div class="dim tiny">A tiny set of useful shortcuts</div></div>
+    <button class="btn" data-folder>＋ Folder</button></div><div class="things" data-files>
+    <div class="thing" data-file="Notes"><div class="mark">✎</div><div class="label">Notepad</div></div>
+    <div class="thing" data-file="Terminal"><div class="mark">›_</div><div class="label">Terminal</div></div>
+    <div class="thing" data-file="Browser"><div class="mark">↗</div><div class="label">Browser</div></div>
+    <div class="thing" data-file="Spotify"><div class="mark">♫</div><div class="label">Spotify Playlist</div></div>
+    <div class="thing" data-file="Settings"><div class="mark">⚙</div><div class="label">Preferences</div></div>
+    <div class="thing" data-file="About Me"><div class="mark">☺</div><div class="label">About Me</div></div></div>
+    <p class="dim tiny" style="margin-top:18px">Double-click an item to open it. This is a desktop simulation, not your actual files.</p>`,
 
-    Notes: `<div class="spread" style="margin-bottom:10px"><div><div class="hdr" style="margin-bottom:4px">Notepad</div><div class="dim tiny">Saved in this browser, on this device.</div></div><span style="color:var(--orange)">✎</span></div><textarea class="note-area" data-note placeholder="A thought, a plan, a tiny dream…&#10;&#10;Start anywhere."></textarea><div class="note-foot"><span data-save-status>Ready when you are</span><button class="btn" data-clear>Clear note</button></div>`,
+    Notes: `<div class="spread" style="margin-bottom:10px"><div><div class="hdr" style="margin-bottom:4px">Notepad</div>
+    <div class="dim tiny">Saved in this browser, on this device.</div></div><span style="color:var(--orange)">✎</span></div>
+    <textarea class="note-area" data-note placeholder="A thought, a plan, a tiny dream…&#10;&#10;Start anywhere."></textarea>
+    <div class="note-foot"><span data-save-status>Ready when you are</span><button class="btn" data-clear>Clear note</button></div>`,
 
-    Spotify: `<div class="hdr">One of my Spotify playlist</div><p class="dim tiny" style="margin:-4px 0 13px">Playlist embedded from Spotify. Sign in if playback asks.</p><iframe class="spotify-frame" src="https://open.spotify.com/embed/playlist/69wnpvx13yjxzN0pt0Q0u4?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Spotify playlist"></iframe>`,
+    Spotify: `<div class="hdr">One of my Spotify playlist</div>
+    <p class="dim tiny" style="margin:-4px 0 13px">Playlist embedded from Spotify. Sign in if playback asks.</p><iframe class="spotify-frame" src="https://open.spotify.com/embed/playlist/69wnpvx13yjxzN0pt0Q0u4?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Spotify playlist"></iframe>`,
 
-    'About Me': `<div class="aboutwrap"><div class="bigd">D.</div><div><div class="hdr">Something About me</div><h2 style="font:650 30px/1.02 Fraunces,serif;letter-spacing:-.04em;margin:7px 0 12px">Hello, I'm HostApple.</h2><p class="dim" style="line-height:1.8">DasadappleOS is my small corner of the web — a WebOS for experimenting, collecting ideas, listening to music and making things feel a little more personal.</p><p style="line-height:1.8">I like this interface . It is clean but there are some bugs that I still have to fix such as the dock color bug . The icon names color doesnt show untill you hover , that was not intended so I will try to fix it soon.</p><div class="notebox" style="margin-top:14px"><p style="margin:0;line-height:1.8">Just a small little project for HackClub Stardance Challenge</p></div><p class="dim tiny" style="margin-top:14px"></p></div></div>`,
+    'About Me': `<div class="aboutwrap"><div class="bigd">D.</div><div>
+    <div class="hdr">Something About me</div><h2 style="font:650 30px/1.02 Fraunces,serif;letter-spacing:-.04em;margin:7px 0 12px">Hello, I'm HostApple.</h2>
+    <p class="dim" style="line-height:1.8">DasadappleOS is my small corner of the web — a WebOS for experimenting, collecting ideas, listening to music and making things feel a little more personal.</p>
+    <p style="line-height:1.8">I like this interface . It is clean but there are some bugs that I still have to fix such as the dock color bug . The icon names color doesnt show untill you hover , that was not intended so I will try to fix it soon.</p><div class="notebox" style="margin-top:14px"><p style="margin:0;line-height:1.8">Just a small little project for HackClub Stardance Challenge</p></div><p class="dim tiny" style="margin-top:14px"></p></div></div>`,
 
-    Settings: `<div class="hdr">Make it yours</div><div class="prefline"><div><strong>Accent color</strong><div class="dim tiny" style="margin-top:4px">Pick a little character</div></div><div class="linedup"><button class="swatch picked" data-color="#000000" style="background:#000000" aria-label="Black"></button><button class="swatch" data-color="#ffffff" style="background:#ffffff" aria-label="White"></button></div></div><div class="prefline"><div><strong>Use your own wallpaper</strong><div class="dim tiny" style="margin-top:4px">Choose an image from your device</div></div><button class="btn" data-upload>Choose image</button></div><div class="prefline"><div><strong>Restore paper background</strong><div class="dim tiny" style="margin-top:4px">Return to the original desktop</div></div><button class="btn" data-reset-wallpaper>Reset</button></div><div class="notebox" style="margin-top:16px"><h2 style="font:650 23px Fraunces,serif;margin:9px 0">A workbench for your brain.</h2><p class="dim tiny" style="line-height:1.7;margin-bottom:0">No account, no password, no pressure. Just open it and explore.</p></div>`
+    Settings: `<div class="hdr">Make it yours</div>
+    <div class="prefline"><div><strong>Accent color</strong>
+    <div class="dim tiny" style="margin-top:4px">Pick a little character</div></div>
+    <div class="linedup"><button class="swatch picked" data-color="#000000" style="background:#000000" aria-label="Black">
+    </button>
+    <button class="swatch" data-color="#ffffff" style="background:#ffffff" aria-label="White"></button></div></div>
+    <div class="prefline"><div><strong>Use your own wallpaper</strong><div class="dim tiny" style="margin-top:4px">Choose an image from your device</div></div>
+    <button class="btn" data-upload>Choose image</button></div><div class="prefline"><div><strong>Restore paper background</strong><div class="dim tiny" style="margin-top:4px">Return to the original desktop</div></div>
+    <button class="btn" data-reset-wallpaper>Reset</button></div><div class="notebox" style="margin-top:16px"><h2 style="font:650 23px Fraunces,serif;margin:9px 0">A workbench for your brain.</h2><p class="dim tiny" style="line-height:1.7;margin-bottom:0">No account, no password, no pressure. Just open it and explore.</p></div>`
   };
 
   function openApp(name) {
@@ -480,7 +574,10 @@ Type <span class="accent">help</span> for commands.
       win.style.height = 'min(510px, calc(100vh - 160px))';
     }
 
-    win.innerHTML = `<div class="windowhead"><div class="dots"><button data-close aria-label="Close"></button><button data-minimize aria-label="Minimize"></button><button data-maximize aria-label="Maximize"></button></div><div class="windowname">${appDetails[name].icon} &nbsp; ${appDetails[name].title}</div><span class="stamp">DASADAPPLEOS</span></div><div class="pane">${views[name]}</div>`;
+    win.innerHTML = `<div class="windowhead">
+    <div class="dots"><button data-close aria-label="Close"></button>
+    <button data-minimize aria-label="Minimize"></button><button data-maximize aria-label="Maximize"></button></div>
+    <div class="windowname">${appDetails[name].icon} &nbsp; ${appDetails[name].title}</div><span class="stamp">DASADAPPLEOS</span></div><div class="pane">${views[name]}</div>`;
 
     windowLayer.appendChild(win);
     windows.set(name, win);

@@ -1,11 +1,11 @@
-# DasadappleOS 🍎
+# DasadappleOS 
 
 > A personal web desktop built for Hackclub stardance event and making the browser feel like a workspace.
 > https://hostapple.github.io/DasadappleOS/
 
 **DasadappleOS** is a browser-based desktop environment inspired by desktop operating systems(windows and linux) with minimal design. It combines a clean interface with draggable windows, useful mini-apps(spotify player , notes app , desktop clock , folder feature maps etc), and smooth interactions — all without a login screen.
 
-## ✨ Features
+##  Features
 
 -  **Desktop environment** — a clean, minimal workspace.
 -  **Draggable windows** — move, minimize, maximize, restore, and close app windows.
@@ -19,7 +19,7 @@
 -  **Startup animation** — a custom DasadappleOS introduction followed by an Apple-inspired “hello” welcome screen.
 -  **No account required** — open the desktop and start exploring.
 
-## 🛠️ Built With
+##  Built With
 
 - HTML
 - CSS
@@ -30,12 +30,12 @@
 
 | Shortcut | Action |
 |---|---|
-| `Ctrl + K` / `Cmd + K` | Open the command palette  |
+| `Ctrl + K` / `Cmd + K` | Open the command palette  | ( currently under development )
 | `Ctrl + Space` | Open the terminal |
 
 Some actions may vary depending on your browser and operating system.
 
-## 🎨 Design Philosophy
+##  Design Philosophy
 
 DasadappleOS aims to keep things simple:
 
@@ -56,12 +56,8 @@ The goal is to make a small web project feel like a thoughtfully designed operat
 - [ ] Improve keyboard accessibility ( this was very hard to do ngl ).
 - [ ] Add more useful desktop applications.
 
-## ⚠️ Notes
+##  Notes
 
 - Spotify playback and availability depend on Spotify and the user's account or region.
 - Browser security and storage policies may affect some features when opening the file directly.
 - This project is experimental and may contain bugs.
-
-## 👨‍💻 Author
-
-Created as a personal webOS experiment by **HostApple**.
